@@ -1,0 +1,319 @@
+@@ -118,10 +118,26 @@
+ file.  The term |print| is used instead of |write| when this program writes
+ on |output|, so that all such output could easily be redirected if desired.
+ 
+-@d print(...)	write(__VA_ARGS__)
+-@d print_ln(...)	write_ln(__VA_ARGS__)
++@d print(...) fprintf(output,__VA_ARGS__)
++@d print_ln(X,...) fprintf(output,X"\n",##__VA_ARGS__)
+ 
+ @p@!@!@!
++#include <stdint.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <math.h>
++
++@h
++
++#define chr(X) ((unsigned char)(X))
++#define get(file) @[file.d=fgetc(file.f)@]
++#define read(file,x) @[x=file.d,get(file)@]
++#define eof(file) @[(file.f==NULL||feof(file.f))@]
++#define set_pos(file,n) @[fseek(file.f,n,SEEK_SET),get(file)@]
++#define write(file,...) @[fprintf(file.f,__VA_ARGS__)@]
++
+ @<Labels in the outer block@>@;
+ @<Constants in the outer block@>@;
+ @<Types in the outer block@>@;
+@@ -162,13 +178,13 @@
+ contains the only non-local |goto| statement in \.{GFtoPK}.
+ @^system dependencies@>
+ 
+-@d abort(...)	{@+print( ' ' ,__VA_ARGS__);jump_out();
++@d abort(...) {@+print(" "__VA_ARGS__);jump_out();
+     } 
+-@d bad_gf(...)	abort("Bad GF file: ",__VA_ARGS__, '!' )
++@d bad_gf(X,...) abort("Bad GF file: "X"!",##__VA_ARGS__)
+ @.Bad GF file@>
+ 
+ @p void jump_out(void)
+-{@+exit(0);
++{@+exit(1);
+ } 
+ 
+ @*The character set.
+@@ -1126,18 +1142,19 @@
+ @<Glob...@>=
+ byte_file @!gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
+ byte_file @!pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
++FILE *output;
+ 
+ @ To prepare the |gf_file| for input, we |reset| it.
+ 
+ @p void open_gf_file(void) /*prepares to read packed bytes in |gf_file|*/ 
+-{@+reset(gf_file);
++{@+get(gf_file);
+ gf_loc=0;
+ } 
+ 
+ @ To prepare the |pk_file| for output, we |rewrite| it.
+ 
+ @p void open_pk_file(void) /*prepares to write packed bytes in |pk_file|*/ 
+-{@+rewrite(pk_file);
++{
+ pk_loc=0;pk_open=true;
+ } 
+ 
+@@ -1169,17 +1186,20 @@
+ {@+eight_bits b;
+ if (eof(gf_file)) bad_gf("Unexpected end of file!")@;
+ @.Unexpected end of file@>
+-else{@+read(gf_file, b);gf_byte=b;
++else{@+read(gf_file, b);
+   } 
+ incr(gf_loc);
++return b;
+ } 
+ @#
+ int gf_signed_quad(void) /*returns the next four bytes, signed*/ 
+ {@+eight_bits a, @!b, @!c, @!d;
++int signed_quad;
+ read(gf_file, a);read(gf_file, b);read(gf_file, c);read(gf_file, d);
+-if (a < 128) gf_signed_quad=((a*256+b)*256+c)*256+d;
+-else gf_signed_quad=(((a-256)*256+b)*256+c)*256+d;
++if (a < 128) signed_quad=((a*256+b)*256+c)*256+d;
++else signed_quad=(((a-256)*256+b)*256+c)*256+d;
+ gf_loc=gf_loc+4;
++return signed_quad;
+ } 
+ 
+ @ We also need a few routines to write data to the \.{PK} file.  We write
+@@ -1191,7 +1211,7 @@
+ {@+
+    if (pk_open) {@+
+       if (a < 0) a=a+256;
+-      write(pk_file, a);
++      write(pk_file, "%c", a);
+       incr(pk_loc);
+    } 
+ } 
+@@ -1199,16 +1219,16 @@
+ void pk_halfword(int a)
+ {@+
+    if (a < 0) a=a+65536;
+-   write(pk_file, a/256);
+-   write(pk_file, a%256);
++   write(pk_file, "%c", a/256);
++   write(pk_file, "%c", a%256);
+    pk_loc=pk_loc+2;
+ } 
+ @#
+ void pk_three_bytes(int a)
+ {@+
+-   write(pk_file, a/65536%256);
+-   write(pk_file, a/256%256);
+-   write(pk_file, a%256);
++   write(pk_file, "%c", a/65536%256);
++   write(pk_file, "%c", a/256%256);
++   write(pk_file, "%c", a%256);
+    pk_loc=pk_loc+3;
+ } 
+ @#
+@@ -1221,10 +1241,10 @@
+          a=a+010000000000;
+          b=128+a/16777216;
+       } else b=a/16777216;
+-      write(pk_file, b);
+-      write(pk_file, a/65536%256);
+-      write(pk_file, a/256%256);
+-      write(pk_file, a%256);
++      write(pk_file, "%c", b);
++      write(pk_file, "%c", a/65536%256);
++      write(pk_file, "%c", a/256%256);
++      write(pk_file, "%c", a%256);
+       pk_loc=pk_loc+4;
+    } 
+ } 
+@@ -1262,7 +1282,7 @@
+ 
+ @p void find_gf_length(void)
+ {@+
+-   set_pos(gf_file,-1);gf_len=cur_pos(gf_file);
++   fseek(gf_file.f,0,SEEK_END);gf_len=ftell(gf_file.f);
+ } 
+ @#
+ void move_to_byte(int @!n)
+@@ -1389,7 +1409,7 @@
+         case boc: case boc1: @<Interpret character@>@;@+break;
+         @<Specials and |no_op| cases@>;@+break;
+         case post: ;@+break; /*we will actually do the work for this one later*/ 
+-     default:bad_gf("Unexpected ", gf_com: 1," command between characters")@;
++     default:bad_gf("Unexpected %d command between characters", gf_com)@;
+ @.Unexpected command@>
+      } 
+    }@+ while (!(gf_com==post));
+@@ -1398,19 +1418,19 @@
+ 
+ @ We need a few easy macros to expand some case statements:
+ 
+-@d four_cases(X)	X: X: case 1: X: case 2: X: case 3
+-@d sixteen_cases(X)	four_cases(X): four_cases(X: case 4): four_cases(X: case 8): 
+-         four_cases(X: case 12)
+-@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X: case 16): 
+-         sixteen_cases(X: case 32): sixteen_cases(X: case 48)
+-@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X: case 64): 
+-         sixteen_cases(X: case 128): sixteen_cases(X: case 144): four_cases(X: case 160): X: case 164
++@d four_cases(X)	case X: case X+1: case X+2: case X+3
++@d sixteen_cases(X)	four_cases(X): four_cases(X+4): four_cases(X+8):
++         four_cases(X+12)
++@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X+16):
++         sixteen_cases(X+32): sixteen_cases(X+48)
++@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X+64):
++         sixteen_cases(X+128): sixteen_cases(X+144): four_cases(X+160): case X+164
+ 
+ @ In this program, all special commands are passed unchanged and any |no_op|
+ bytes are ignored, so we write some code to handle these:
+ 
+ @<Specials and |no_op| cases@>=
+-four_cases(case xxx1): {@+
++four_cases(xxx1): {@+
+    pk_byte(gf_com-xxx1+pk_xxx1);
+    i=0;for (j=0; j<=gf_com-xxx1; j++) {@+
+       k=gf_byte();pk_byte(k);i=i*256+k;
+@@ -1445,7 +1465,7 @@
+   if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
+   else gf_ch_mod_256=255-((-(1+gf_ch))%256);
+   if (status[gf_ch_mod_256]==virgin) 
+-    bad_gf("no character locator for character ", gf_ch: 1);
++    bad_gf("no character locator for character %d", gf_ch);
+ @.no character locator...@>
+   @<Convert character to packed form@>;
+ } 
+@@ -1508,13 +1528,13 @@
+     gf_com=gf_byte();
+     switch (gf_com) {
+ @t\4@>@<Cases for |paint| commands@>@;@+break;
+-four_cases(case skip0): {@+
++four_cases(skip0): {@+
+   i=0;for (j=1; j<=gf_com-skip0; j++) i=i*256+gf_byte();
+   if (on==state) put_in_rows(extra);
+   for (j=0; j<=i; j++) put_in_rows(end_of_row);
+   on=false;extra=0;state=true;
+ } @+break;
+-one_sixty_five_cases(case new_row_0): {@+
++one_sixty_five_cases(new_row_0): {@+
+   if (on==state) put_in_rows(extra);
+   put_in_rows(end_of_row);
+   on=true;extra=gf_com-new_row_0;state=false;
+@@ -1533,7 +1553,7 @@
+     abort("Internal error while writing character!");
+ @.Internal error@>
+ } @+break;
+-default:bad_gf("Unexpected ", gf_com: 1," command in character definition")@;
++default:bad_gf("Unexpected %d command in character definition", gf_com)@;
+ @.Unexpected command@>
+     } 
+   }@+ while (!(gf_com==eoc));
+@@ -1553,7 +1573,7 @@
+   state=!state;
+   on=!on;
+ } @+break;
+-sixty_four_cases(case paint_0+1): case paint1+1: case paint1+2: {@+
++sixty_four_cases(paint_0+1): case paint1+1: case paint1+2: {@+
+   if (gf_com < paint1) i=gf_com-paint_0;
+   else{@+
+     i=0;for (j=0; j<=gf_com-paint1; j++) i=i*256+gf_byte();
+@@ -1577,7 +1597,7 @@
+ 
+ @<Find and interpret postamble@>=
+ find_gf_length();
+-if (gf_len < 8) bad_gf("only ", gf_len: 1," bytes long");
++if (gf_len < 8) bad_gf("only %d bytes long", gf_len);
+ @.only n bytes long@>
+ post_loc=gf_len-4;
+ @/do@+{
+@@ -1585,16 +1605,16 @@
+ @.all 223\char39s@>
+    move_to_byte(post_loc);k=gf_byte();decr(post_loc);
+ }@+ while (!(k!=223));
+-if (k!=gf_id_byte) bad_gf("ID byte is ", k: 1);
++if (k!=gf_id_byte) bad_gf("ID byte is %d", k);
+ @.ID byte is wrong@>
+-if (post_loc < 5) bad_gf("post location is ", post_loc: 1);
++if (post_loc < 5) bad_gf("post location is %d", post_loc);
+ @.post location is@>
+ move_to_byte(post_loc-3);
+ q=gf_signed_quad();
+-if ((q < 0)||(q > post_loc-3)) bad_gf("post pointer is ", q: 1);
++if ((q < 0)||(q > post_loc-3)) bad_gf("post pointer is %d", q);
+ @.post pointer is wrong@>
+ move_to_byte(q);k=gf_byte();
+-if (k!=post) bad_gf("byte at ", q: 1," is not post");
++if (k!=post) bad_gf("byte at %d is not post", q);
+ @.byte is not post@>
+ i=gf_signed_quad(); /*skip over junk*/ 
+ design_size=gf_signed_quad();
+@@ -1627,7 +1647,7 @@
+ } @+break;
+ @<Specials and |no_op| cases@>;@+break;
+ case post_post: ;@+break;
+-default:bad_gf("Unexpected ", gf_com: 1," in postamble")@;
++default:bad_gf("Unexpected %d in postamble", gf_com)@;
+ @.Unexpected command@>
+   } 
+ }@+ while (!(gf_com==post_post))
+@@ -2122,13 +2142,13 @@
+ if (k > 255) pk_byte(255);@+else pk_byte(k);
+ for (k=1; k<=comm_length; k++) 
+   if ((i > 0)||(k <= comm_length-from_length)) pk_byte(xord[comment[k]]);
+-print( '\'' );
++print("'");
+ for (k=1; k<=i; k++) 
+   {@+if (k > 1) j=gf_byte();
+-  print(xchr[j]);
++  print("%c",xchr[j]);
+   if (k < 256-comm_length) pk_byte(j);
+   } 
+-print_ln( '\'' );@/
++print_ln("'");@/
+ pk_word(design_size);
+ pk_word(check_sum);
+ pk_word(hppp);
+@@ -2137,10 +2157,10 @@
+ @ Of course, we need an array to hold the comment.
+ 
+ @<Glob...@>=
+-uint8_t @!comment0[comm_length], *const @!comment = @!comment0-1;
++uint8_t @!comment0[comm_length+1], *const @!comment = @!comment0-1;
+ 
+ @ @<Set init...@>=
+-comment=preamble_comment;
++strcpy(comment+1, preamble_comment);
+ 
+ @ Writing the postamble is even easier.
+ 
+@@ -2155,16 +2175,19 @@
+ @<Check for unrasterized locators@>=
+ for (i=0; i<=255; i++) 
+    if (status[i]==located) 
+-      print_ln("Character ", i: 1," missing raster information!")
++      print_ln("Character %d missing raster information!", i)
+ @.missing raster information@>
+ 
+ @ Finally, the main program.
+ 
+-@p int main(void) {
++@p int main(int argc, char **argv) { if (argc != 4) return 2;
++  if ((gf_file.f=fopen(argv[1],"r"))==NULL) return 2;
++  if ((pk_file.f=fopen(argv[2],"w"))==NULL) return 2;
++  if ((output=fopen(argv[3],"w"))==NULL) return 2;
+   initialize();
+   convert_gf_file();
+   @<Check for unrasterized locators@>;
+-  print_ln(gf_len: 1," bytes packed to ", pk_loc: 1," bytes.");
++  print_ln("%d bytes packed to %d bytes.", gf_len, pk_loc);
+ return 0; }
+ 
+ @ A few more globals.

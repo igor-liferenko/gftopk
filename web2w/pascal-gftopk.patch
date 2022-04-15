@@ -1,0 +1,17 @@
+@@ -223,7 +223,7 @@
+          }
+        ;
+ 
+-programheading: PPROGRAM PID PSEMICOLON  {IGN($2); IGN($3); }
++programheading: PPROGRAM PID POPEN PID PCOMMA PID PCOMMA PID PCLOSE PSEMICOLON  {IGN($2); IGN($3); IGN($4); IGN($5); IGN($6); IGN($7); IGN($8); IGN($9); IGN($10); }
+               ;
+ 
+ globals: labels constants types variables procedures ;
+@@ -674,6 +675,7 @@
+           | CCASE NMACRO
+           | CCASE PINTEGER
+           | CCASE NMACRO PPLUS NMACRO 
++          | CCASE NMACRO PPLUS PINTEGER
+           | NMACRO PMINUS NMACRO PPLUS NMACRO  
+          {winsert_after($1->previous,CCASE,"case ");  /* etex */ }
+           ;

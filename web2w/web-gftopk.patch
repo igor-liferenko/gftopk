@@ -1,0 +1,18 @@
+@@ -19,7 +19,7 @@
+ */
+ %{
+ #include "web2w.h"
+-#include "pascal.tab.h"
++#include "pascal-gftopk.tab.h"
+ %}
+ 
+ %option prefix="ww"
+@@ -221,7 +221,7 @@
+ 
+ "endcases"     TOK("endcases",PEND);
+ "othercases"   TOK("othercases",POTHERS);
+-"mtype"        TOK("type",PTYPE);
++"type"        TOK("type",PTYPE);
+ "final_end"    TOK("final_end",PEXIT);
+ 
+ "return"       TOK_RETURN;
