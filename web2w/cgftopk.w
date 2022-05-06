@@ -132,7 +132,7 @@ on |output|, so that all such output could easily be redirected if desired.
 @h
 
 #define chr(X) ((unsigned char)(X))
-#define get(file) @[file.d=fgetc(file.f)@]
+#define get(file) @[fread(&((file).d),sizeof((file).d),1,(file).f)@]
 #define read(file,x) @[x=file.d,get(file)@]
 #define eof(file) @[(file.f==NULL||feof(file.f))@]
 #define set_pos(file,n) @[fseek(file.f,n,SEEK_SET),get(file)@]
