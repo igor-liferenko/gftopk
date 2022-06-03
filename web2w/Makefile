@@ -8,4 +8,4 @@ all:
 	@sed '1106s/file/File/;1404,1410s/+/,/g' gftopk.web >gftopk-web2w.web
 	./web2w -o cgftopk.w gftopk-web2w.web
 	patch -s cgftopk.w cgftopk.patch
-	weave gftopk >/dev/null && sed -i 1s/webmac/pwebmac/ gftopk.tex && pdftex gftopk >/dev/null && tex gftopk >/dev/null
+	weave gftopk >/dev/null && sed -i 1s/webmac/pwebmac/ gftopk.tex && pdftex gftopk >/dev/null
