@@ -3,4 +3,4 @@ all:
 	cp web2w/cgftopk.w gftopk.w
 	ctangle gftopk nocomment
 	gcc gftopk.c -o gftopk -lm
-	cweave -f gftopk
+	@cweave -f gftopk
