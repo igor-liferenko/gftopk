@@ -129,14 +129,14 @@ on |output|, so that all such output could easily be redirected if desired.
 #include <string.h>
 #include <math.h>
 
-@h
-
 #define chr(X) ((unsigned char)(X))
 #define get(file) @[fread(&((file).d),sizeof((file).d),1,(file).f)@]
 #define read(file,x) @[x=file.d,get(file)@]
 #define eof(file) @[(file.f==NULL||feof(file.f))@]
 #define set_pos(file,n) @[fseek(file.f,n,SEEK_SET),get(file)@]
 #define write(file,...) @[fprintf(file.f,__VA_ARGS__)@]
+
+@h
 
 @<Labels in the outer block@>@;
 @<Constants in the outer block@>@;
