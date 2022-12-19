@@ -130,6 +130,7 @@ on |output|, so that all such output could easily be redirected if desired.
 #include <math.h>
 
 #define chr(X) ((unsigned char)(X))
+#define round(X) ((int)((X)>=0.0?floor((X)+0.5):ceil((X)-0.5)))
 
 @h
 
