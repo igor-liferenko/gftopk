@@ -1,6 +1,6 @@
 --- cgftopk.w
 +++ cgftopk.w
-@@ -118,10 +118,26 @@
+@@ -118,10 +118,28 @@
  file.  The term |print| is used instead of |write| when this program writes
  on |output|, so that all such output could easily be redirected if desired.
  
@@ -18,18 +18,20 @@
 +#include <math.h>
 +
 +#define chr(X) ((unsigned char)(X))
++#define round(X) ((int)((X)>=0.0?floor((X)+0.5):ceil((X)-0.5)))
++
++@h
++
 +#define get(file) @[fread(&((file).d),sizeof((file).d),1,(file).f)@]
 +#define read(file,x) @[x=file.d,get(file)@]
 +#define eof(file) @[(file.f==NULL||feof(file.f))@]
 +#define set_pos(file,n) @[fseek(file.f,n,SEEK_SET),get(file)@]
 +#define write(file,...) @[fprintf(file.f,__VA_ARGS__)@]
 +
-+@h
-+
  @<Labels in the outer block@>@;
  @<Constants in the outer block@>@;
  @<Types in the outer block@>@;
-@@ -162,13 +178,13 @@
+@@ -162,13 +180,13 @@
  contains the only non-local |goto| statement in \.{GFtoPK}.
  @^system dependencies@>
  
@@ -46,7 +48,7 @@
  } 
  
  @*The character set.
-@@ -1126,18 +1142,19 @@
+@@ -1126,18 +1144,19 @@
  @<Glob...@>=
  byte_file @!gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
  byte_file @!pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
@@ -68,7 +70,7 @@
  pk_loc=0;pk_open=true;
  } 
  
-@@ -1169,17 +1186,20 @@
+@@ -1169,17 +1188,20 @@
  {@+eight_bits b;
  if (eof(gf_file)) bad_gf("Unexpected end of file!")@;
  @.Unexpected end of file@>
@@ -92,7 +94,7 @@
  } 
  
  @ We also need a few routines to write data to the \.{PK} file.  We write
-@@ -1191,7 +1211,7 @@
+@@ -1191,7 +1213,7 @@
  {@+
     if (pk_open) {@+
        if (a < 0) a=a+256;
@@ -101,7 +103,7 @@
        incr(pk_loc);
     } 
  } 
-@@ -1199,16 +1219,16 @@
+@@ -1199,16 +1221,16 @@
  void pk_halfword(int a)
  {@+
     if (a < 0) a=a+65536;
@@ -123,7 +125,7 @@
     pk_loc=pk_loc+3;
  } 
  @#
-@@ -1221,10 +1241,10 @@
+@@ -1221,10 +1243,10 @@
           a=a+010000000000;
           b=128+a/16777216;
        } else b=a/16777216;
@@ -138,7 +140,7 @@
        pk_loc=pk_loc+4;
     } 
  } 
-@@ -1262,7 +1282,7 @@
+@@ -1262,7 +1284,7 @@
  
  @p void find_gf_length(void)
  {@+
@@ -147,7 +149,7 @@
  } 
  @#
  void move_to_byte(int @!n)
-@@ -1389,7 +1409,7 @@
+@@ -1389,7 +1411,7 @@
          case boc: case boc1: @<Interpret character@>@;@+break;
          @<Specials and |no_op| cases@>;@+break;
          case post: ;@+break; /*we will actually do the work for this one later*/ 
@@ -156,7 +158,7 @@
  @.Unexpected command@>
       } 
     }@+ while (!(gf_com==post));
-@@ -1398,19 +1418,19 @@
+@@ -1398,19 +1420,19 @@
  
  @ We need a few easy macros to expand some case statements:
  
@@ -184,7 +186,7 @@
     pk_byte(gf_com-xxx1+pk_xxx1);
     i=0;for (j=0; j<=gf_com-xxx1; j++) {@+
        k=gf_byte();pk_byte(k);i=i*256+k;
-@@ -1445,7 +1465,7 @@
+@@ -1445,7 +1467,7 @@
    if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
    else gf_ch_mod_256=255-((-(1+gf_ch))%256);
    if (status[gf_ch_mod_256]==virgin) 
@@ -193,7 +195,7 @@
  @.no character locator...@>
    @<Convert character to packed form@>;
  } 
-@@ -1508,13 +1528,13 @@
+@@ -1508,13 +1530,13 @@
      gf_com=gf_byte();
      switch (gf_com) {
  @t\4@>@<Cases for |paint| commands@>@;@+break;
@@ -209,7 +211,7 @@
    if (on==state) put_in_rows(extra);
    put_in_rows(end_of_row);
    on=true;extra=gf_com-new_row_0;state=false;
-@@ -1533,7 +1553,7 @@
+@@ -1533,7 +1555,7 @@
      abort("Internal error while writing character!");
  @.Internal error@>
  } @+break;
@@ -218,7 +220,7 @@
  @.Unexpected command@>
      } 
    }@+ while (!(gf_com==eoc));
-@@ -1553,7 +1573,7 @@
+@@ -1553,7 +1575,7 @@
    state=!state;
    on=!on;
  } @+break;
@@ -227,7 +229,7 @@
    if (gf_com < paint1) i=gf_com-paint_0;
    else{@+
      i=0;for (j=0; j<=gf_com-paint1; j++) i=i*256+gf_byte();
-@@ -1577,7 +1597,7 @@
+@@ -1577,7 +1599,7 @@
  
  @<Find and interpret postamble@>=
  find_gf_length();
@@ -236,7 +238,7 @@
  @.only n bytes long@>
  post_loc=gf_len-4;
  @/do@+{
-@@ -1585,16 +1605,16 @@
+@@ -1585,16 +1607,16 @@
  @.all 223\char39s@>
     move_to_byte(post_loc);k=gf_byte();decr(post_loc);
  }@+ while (!(k!=223));
@@ -257,7 +259,7 @@
  @.byte is not post@>
  i=gf_signed_quad(); /*skip over junk*/ 
  design_size=gf_signed_quad();
-@@ -1627,7 +1647,7 @@
+@@ -1627,7 +1649,7 @@
  } @+break;
  @<Specials and |no_op| cases@>;@+break;
  case post_post: ;@+break;
@@ -266,7 +268,7 @@
  @.Unexpected command@>
    } 
  }@+ while (!(gf_com==post_post))
-@@ -2122,13 +2142,13 @@
+@@ -2122,13 +2144,13 @@
  if (k > 255) pk_byte(255);@+else pk_byte(k);
  for (k=1; k<=comm_length; k++) 
    if ((i > 0)||(k <= comm_length-from_length)) pk_byte(xord[comment[k]]);
@@ -283,7 +285,7 @@
  pk_word(design_size);
  pk_word(check_sum);
  pk_word(hppp);
-@@ -2137,10 +2157,10 @@
+@@ -2137,10 +2159,10 @@
  @ Of course, we need an array to hold the comment.
  
  @<Glob...@>=
@@ -296,7 +298,7 @@
  
  @ Writing the postamble is even easier.
  
-@@ -2155,16 +2175,19 @@
+@@ -2155,16 +2177,19 @@
  @<Check for unrasterized locators@>=
  for (i=0; i<=255; i++) 
     if (status[i]==located) 
