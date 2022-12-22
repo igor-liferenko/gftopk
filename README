@@ -3,7 +3,10 @@ Based on https://w3-o.cs.hm.edu/users/ruckert/public_html/web2w/
 Add this `gftodvi' script to PATH:
 
     #!/bin/sh
-    /path/to/gftopk/gftopk $1 ${1%gf}pk /dev/null
+    /path/to/gftopk/gftopk $1 ${1%gf}pk /dev/stdout
+    ret=$?
+    echo
+    exit $ret
 
 -----------------------------------
 
