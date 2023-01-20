@@ -1,18 +1,9 @@
 Based on https://w3-o.cs.hm.edu/users/ruckert/public_html/web2w/
 
-Add this `gftodvi' script to PATH:
+Add this `gftopk' script to PATH:
 
     #!/bin/sh
     /path/to/gftopk/gftopk $1 ${1%gf}pk /dev/stdout
     ret=$?
     echo
     exit $ret
-
------------------------------------
-
-Other WEB programs converted to CWEB:
-
-    https://github.com/igor-liferenko/tex
-    https://github.com/igor-liferenko/mf
-    https://github.com/igor-liferenko/dvitype
-    https://github.com/igor-liferenko/gftodvi
