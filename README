@@ -5,5 +5,5 @@ Add this `gftopk' script to PATH:
     #!/bin/sh
     /path/to/gftopk/gftopk $1 ${1%gf}pk /dev/stdout
     ret=$?
-    echo
+    /path/to/tex/newline
     exit $ret
