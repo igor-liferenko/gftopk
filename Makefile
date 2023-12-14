@@ -3,4 +3,3 @@ all:
 	cp web2w/cgftopk.w gftopk.w
 	ctangle gftopk
 	gcc gftopk.c -o gftopk -lm
-	@cweave -f gftopk
