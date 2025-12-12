@@ -1,12 +1,11 @@
-gftopk-web2w.web
-pascal-gftopk.y
 pascal-gftopk.output
 pascal-gftopk.tab.c
 pascal-gftopk.tab.h
-web-gftopk.l
 web.lex.c
 web2w
 web2w.c
 web2w.h
+pascal-gftopk.y
+web-gftopk.l
+gftopk-web2w.web
 cgftopk.w
-CONTENTS.tex
