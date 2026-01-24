@@ -1,5 +1,3 @@
---- cgftopk.w
-+++ cgftopk.w
 @@ -118,10 +118,28 @@
  file.  The term |print| is used instead of |write| when this program writes
  on |output|, so that all such output could easily be redirected if desired.
