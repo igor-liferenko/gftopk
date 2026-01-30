@@ -155,7 +155,7 @@
  @.Unexpected command@>
       } 
     }@+ while (!(gf_com==post));
-@@ -1398,19 +1419,19 @@
+@@ -1398,13 +1419,13 @@
  
  @ We need a few easy macros to expand some case statements:
  
@@ -166,7 +166,7 @@
 -         sixteen_cases(X: case 32): sixteen_cases(X: case 48)
 -@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X: case 64): 
 -         sixteen_cases(X: case 128): sixteen_cases(X: case 144): four_cases(X: case 160): X: case 164
-+@d four_cases(X)	case X: case X+1: case X+2: case X+3
++@d four_cases(X)	X: X+1: X+2: X+3
 +@d sixteen_cases(X)	four_cases(X): four_cases(X+4): four_cases(X+8):
 +         four_cases(X+12)
 +@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X+16):
@@ -176,13 +176,6 @@
  
  @ In this program, all special commands are passed unchanged and any |no_op|
  bytes are ignored, so we write some code to handle these:
- 
- @<Specials and |no_op| cases@>=
--four_cases(case xxx1): {@+
-+four_cases(xxx1): {@+
-    pk_byte(gf_com-xxx1+pk_xxx1);
-    i=0;for (j=0; j<=gf_com-xxx1; j++) {@+
-       k=gf_byte();pk_byte(k);i=i*256+k;
 @@ -1445,7 +1466,7 @@
    if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
    else gf_ch_mod_256=255-((-(1+gf_ch))%256);
@@ -192,22 +185,6 @@
  @.no character locator...@>
    @<Convert character to packed form@>;
  } 
-@@ -1508,13 +1529,13 @@
-     gf_com=gf_byte();
-     switch (gf_com) {
- @t\4@>@<Cases for |paint| commands@>@;@+break;
--four_cases(case skip0): {@+
-+four_cases(skip0): {@+
-   i=0;for (j=1; j<=gf_com-skip0; j++) i=i*256+gf_byte();
-   if (on==state) put_in_rows(extra);
-   for (j=0; j<=i; j++) put_in_rows(end_of_row);
-   on=false;extra=0;state=true;
- } @+break;
--one_sixty_five_cases(case new_row_0): {@+
-+one_sixty_five_cases(new_row_0): {@+
-   if (on==state) put_in_rows(extra);
-   put_in_rows(end_of_row);
-   on=true;extra=gf_com-new_row_0;state=false;
 @@ -1533,7 +1554,7 @@
      abort("Internal error while writing character!");
  @.Internal error@>
@@ -217,15 +194,6 @@
  @.Unexpected command@>
      } 
    }@+ while (!(gf_com==eoc));
-@@ -1553,7 +1574,7 @@
-   state=!state;
-   on=!on;
- } @+break;
--sixty_four_cases(case paint_0+1): case paint1+1: case paint1+2: {@+
-+sixty_four_cases(paint_0+1): case paint1+1: case paint1+2: {@+
-   if (gf_com < paint1) i=gf_com-paint_0;
-   else{@+
-     i=0;for (j=0; j<=gf_com-paint1; j++) i=i*256+gf_byte();
 @@ -1577,7 +1598,7 @@
  
  @<Find and interpret postamble@>=
