@@ -172,7 +172,7 @@
 +@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X+16):
 +         sixteen_cases(X+32): sixteen_cases(X+48)
 +@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X+64):
-+         sixteen_cases(X+128): sixteen_cases(X+144): four_cases(X+160): case X+164
++         sixteen_cases(X+128): sixteen_cases(X+144): four_cases(X+160): X+164
  
  @ In this program, all special commands are passed unchanged and any |no_op|
  bytes are ignored, so we write some code to handle these:
