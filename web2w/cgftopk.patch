@@ -155,27 +155,6 @@
  @.Unexpected command@>
       } 
     }@+ while (!(gf_com==post));
-@@ -1398,13 +1419,13 @@
- 
- @ We need a few easy macros to expand some case statements:
- 
--@d four_cases(X)	X: X: case 1: X: case 2: X: case 3
--@d sixteen_cases(X)	four_cases(X): four_cases(X: case 4): four_cases(X: case 8): 
--         four_cases(X: case 12)
--@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X: case 16): 
--         sixteen_cases(X: case 32): sixteen_cases(X: case 48)
--@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X: case 64): 
--         sixteen_cases(X: case 128): sixteen_cases(X: case 144): four_cases(X: case 160): X: case 164
-+@d four_cases(X)	X: X+1: X+2: X+3
-+@d sixteen_cases(X)	four_cases(X): four_cases(X+4): four_cases(X+8):
-+         four_cases(X+12)
-+@d sixty_four_cases(X)	sixteen_cases(X): sixteen_cases(X+16):
-+         sixteen_cases(X+32): sixteen_cases(X+48)
-+@d one_sixty_five_cases(X)	sixty_four_cases(X): sixty_four_cases(X+64):
-+         sixteen_cases(X+128): sixteen_cases(X+144): four_cases(X+160): X+164
- 
- @ In this program, all special commands are passed unchanged and any |no_op|
- bytes are ignored, so we write some code to handle these:
 @@ -1445,7 +1466,7 @@
    if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
    else gf_ch_mod_256=255-((-(1+gf_ch))%256);
