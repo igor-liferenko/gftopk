@@ -3,8 +3,6 @@ Add this `gftopk' script to PATH:
     #!/bin/sh
     /path/to/gftopk/gftopk $1 ${1%gf}pk /tmp/gftopk.$$
     ret=$?
-    touch /tmp/gftopk.$$
-    sed -i '$a\' /tmp/gftopk.$$
-    cat /tmp/gftopk.$$
-    rm /tmp/gftopk.$$
+    sed '$a\' /tmp/gftopk.$$ 2>/dev/null
+    rm -f /tmp/gftopk.$$
     exit $ret
