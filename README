@@ -1,7 +1,10 @@
 Add this `gftopk' script to PATH:
 
     #!/bin/sh
-    /path/to/gftopk/gftopk $1 ${1%gf}pk /dev/stdout
+    /path/to/gftopk/gftopk $1 ${1%gf}pk /tmp/gftopk.$$
     ret=$?
-    echo
+    touch /tmp/gftopk.$$
+    sed -i '$a\' /tmp/gftopk.$$
+    cat /tmp/gftopk.$$
+    rm /tmp/gftopk.$$
     exit $ret
