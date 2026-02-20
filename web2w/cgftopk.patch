@@ -253,10 +253,10 @@
  @ Finally, the main program.
  
 -@p int main(void) {
-+@p int main(int argc, char **argv) { if (argc != 4) return 2;
-+  if ((gf_file.f=fopen(argv[1],"r"))==NULL) return 2;
-+  if ((pk_file.f=fopen(argv[2],"w"))==NULL) return 2;
-+  if ((output=fopen(argv[3],"w"))==NULL) return 2;
++@p int main(int argc, char **argv) { if (argc != 4) return 1;
++  if ((gf_file.f=fopen(argv[1],"r"))==NULL) return 1;
++  if ((pk_file.f=fopen(argv[2],"w"))==NULL) return 1;
++  if ((output=fopen(argv[3],"w"))==NULL) return 1;
    initialize();
    convert_gf_file();
    @<Check for unrasterized locators@>;
