@@ -5,6 +5,7 @@ web.lex.c
 web2w
 web2w.c
 web2w.h
+web2w.ch
 pascal-gftopk.y
 web-gftopk.l
 gftopk-web2w.web
