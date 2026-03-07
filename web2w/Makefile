@@ -1,5 +1,6 @@
 all:
-	ctangle web2w web2w-gftopk
+	tie -c web2w.ch web2w.w simplify.ch web2w-gftopk.ch >/dev/null
+	ctangle web2w web2w
 	patch -so web-gftopk.l web.l web-gftopk.patch
 	flex -o web.lex.c web-gftopk.l
 	patch -so pascal-gftopk.y pascal.y pascal-gftopk.patch
