@@ -1,4 +1,16 @@
 @x
+{  reset(gf_file,gf_name);
+@y
+{  reset(gf_file,gf_name); assert(gf_file.f!=NULL); assert(!ferror(gf_file.f));
+@z
+
+@x
+{  rewrite(pk_file,pk_name);
+@y
+{  rewrite(pk_file,pk_name); assert...
+@z
+
+@x
 @ Appendix: Replacement of the string pool file.
 @d str_0_255   "^^@@^^A^^B^^C^^D^^E^^F^^G^^H^^I^^J^^K^^L^^M^^N^^O"@/
   "^^P^^Q^^R^^S^^T^^U^^V^^W^^X^^Y^^Z^^[^^\\^^]^^^^^_"@/

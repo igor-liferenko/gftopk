@@ -17,7 +17,6 @@
 +#include <assert.h>
 +
 +@h
-+
 +#define chr(X) (X)
 +#define get(file) fread(&((file).d),sizeof((file).d),1,(file).f)
 +#define read(file,x) x=file.d,get(file)
@@ -25,7 +24,8 @@
 +#define set_pos(file,n) fseek(file.f,n,SEEK_SET),get(file)
 +#define write(file,...) fprintf(file.f,__VA_ARGS__)
 +#define write_ln(file,X,...) write(file,X"\n",##__VA_ARGS__)
-+
++#define reset(file,name) file.f=fopen(name+1,"r"),file.f!=NULL?get(file):0
++#define rewrite(file,name) file.f=fopen(name+1,"w")
  @<Labels in the outer block@>@;
  @<Constants in the outer block@>@;
  @<Types in the outer block@>@;
@@ -66,7 +66,7 @@
  
  @p void open_gf_file(void) /*prepares to read packed bytes in |gf_file|*/ 
 -{@+reset(gf_file);
-+{ assert((gf_file.f=fopen(gf_name,"r"))!=NULL); get(gf_file); assert(!ferror(gf_file.f));
++{  reset(gf_file,gf_name);
  gf_loc=0;
  } 
  
@@ -74,7 +74,7 @@
  
  @p void open_pk_file(void) /*prepares to write packed bytes in |pk_file|*/ 
 -{@+rewrite(pk_file);
-+{ assert((pk_file.f=fopen(pk_name,"w"))!=NULL);
++{  rewrite(pk_file,pk_name);
  pk_loc=0;pk_open=true;
  } 
  
