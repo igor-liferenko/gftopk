@@ -60,13 +60,13 @@
  byte_file @!gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
  byte_file @!pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
 +text_file output;
-+char **av;
++char *gf_name, *pk_name;
  
  @ To prepare the |gf_file| for input, we |reset| it.
  
  @p void open_gf_file(void) /*prepares to read packed bytes in |gf_file|*/ 
 -{@+reset(gf_file);
-+{ assert((gf_file.f=fopen(av[1],"r"))!=NULL); get(gf_file);
++{ assert((gf_file.f=fopen(gf_name,"r"))!=NULL); get(gf_file); assert(!ferror(gf_file.f));
  gf_loc=0;
  } 
  
@@ -74,7 +74,7 @@
  
  @p void open_pk_file(void) /*prepares to write packed bytes in |pk_file|*/ 
 -{@+rewrite(pk_file);
-+{ assert((pk_file.f=fopen(av[2],"w"))!=NULL);
++{ assert((pk_file.f=fopen(pk_name,"w"))!=NULL);
  pk_loc=0;pk_open=true;
  } 
  
@@ -243,7 +243,7 @@
  
  @ Writing the postamble is even easier.
  
-@@ -2155,16 +2176,18 @@
+@@ -2155,16 +2176,19 @@
  @<Check for unrasterized locators@>=
  for (i=0; i<=255; i++) 
     if (status[i]==located) 
@@ -256,7 +256,8 @@
 -@p int main(void) {
 +@p int main(int argc, char **argv) { assert(argc==4);
 +  assert((output.f=fopen(argv[3],"w"))!=NULL);
-+  av = argv;
++  gf_name = argv[1];
++  pk_name = argv[2];
    initialize();
    convert_gf_file();
    @<Check for unrasterized locators@>;
