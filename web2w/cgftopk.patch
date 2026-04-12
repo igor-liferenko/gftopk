@@ -1,4 +1,4 @@
-@@ -118,10 +118,28 @@
+@@ -118,10 +118,30 @@
  file.  The term |print| is used instead of |write| when this program writes
  on |output|, so that all such output could easily be redirected if desired.
  
@@ -17,6 +17,7 @@
 +#include <assert.h>
 +
 +@h
++
 +#define chr(X) (X)
 +#define get(file) fread(&((file).d),sizeof((file).d),1,(file).f)
 +#define read(file,x) x=file.d,get(file)
@@ -26,10 +27,11 @@
 +#define write_ln(file,X,...) write(file,X"\n",##__VA_ARGS__)
 +#define reset(file,name) file.f=fopen(name+1,"r"),file.f!=NULL?get(file):0
 +#define rewrite(file,name) file.f=fopen(name+1,"w")
++
  @<Labels in the outer block@>@;
  @<Constants in the outer block@>@;
  @<Types in the outer block@>@;
-@@ -162,13 +180,13 @@
+@@ -162,13 +182,13 @@
  contains the only non-local |goto| statement in \.{GFtoPK}.
  @^system dependencies@>
  
@@ -46,7 +48,7 @@
  } 
  
  @*The character set.
-@@ -219,7 +237,7 @@
+@@ -219,7 +239,7 @@
  @<Globals...@>=
  ASCII_code @!xord[256];
     /*specifies conversion of input characters*/ 
@@ -55,7 +57,7 @@
     /*specifies conversion of output characters*/ 
  
  @ Under our assumption that the visible characters of standard ASCII are
-@@ -1126,18 +1144,20 @@
+@@ -1126,18 +1146,20 @@
  @<Glob...@>=
  byte_file @!gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
  byte_file @!pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
@@ -66,7 +68,7 @@
  
  @p void open_gf_file(void) /*prepares to read packed bytes in |gf_file|*/ 
 -{@+reset(gf_file);
-+{  reset(gf_file,gf_name);
++{  reset(gf_file, gf_name);
  gf_loc=0;
  } 
  
@@ -74,11 +76,11 @@
  
  @p void open_pk_file(void) /*prepares to write packed bytes in |pk_file|*/ 
 -{@+rewrite(pk_file);
-+{  rewrite(pk_file,pk_name);
++{  rewrite(pk_file, pk_name);
  pk_loc=0;pk_open=true;
  } 
  
-@@ -1169,17 +1189,18 @@
+@@ -1169,17 +1191,18 @@
  {@+eight_bits b;
  if (eof(gf_file)) bad_gf("Unexpected end of file!")@;
  @.Unexpected end of file@>
@@ -100,7 +102,7 @@
  } 
  
  @ We also need a few routines to write data to the \.{PK} file.  We write
-@@ -1191,7 +1212,7 @@
+@@ -1191,7 +1214,7 @@
  {@+
     if (pk_open) {@+
        if (a < 0) a=a+256;
@@ -109,7 +111,7 @@
        incr(pk_loc);
     } 
  } 
-@@ -1199,16 +1220,16 @@
+@@ -1199,16 +1222,16 @@
  void pk_halfword(int a)
  {@+
     if (a < 0) a=a+65536;
@@ -131,7 +133,7 @@
     pk_loc=pk_loc+3;
  } 
  @#
-@@ -1221,10 +1242,10 @@
+@@ -1221,10 +1244,10 @@
           a=a+010000000000;
           b=128+a/16777216;
        } else b=a/16777216;
@@ -146,7 +148,7 @@
        pk_loc=pk_loc+4;
     } 
  } 
-@@ -1262,7 +1283,7 @@
+@@ -1262,7 +1285,7 @@
  
  @p void find_gf_length(void)
  {@+
@@ -155,7 +157,7 @@
  } 
  @#
  void move_to_byte(int @!n)
-@@ -1389,7 +1410,7 @@
+@@ -1389,7 +1412,7 @@
          case boc: case boc1: @<Interpret character@>@;@+break;
          @<Specials and |no_op| cases@>;@+break;
          case post: ;@+break; /*we will actually do the work for this one later*/ 
@@ -164,7 +166,7 @@
  @.Unexpected command@>
       } 
     }@+ while (!(gf_com==post));
-@@ -1445,7 +1466,7 @@
+@@ -1445,7 +1468,7 @@
    if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
    else gf_ch_mod_256=255-((-(1+gf_ch))%256);
    if (status[gf_ch_mod_256]==virgin) 
@@ -173,7 +175,7 @@
  @.no character locator...@>
    @<Convert character to packed form@>;
  } 
-@@ -1533,7 +1554,7 @@
+@@ -1533,7 +1556,7 @@
      abort("Internal error while writing character!");
  @.Internal error@>
  } @+break;
@@ -182,7 +184,7 @@
  @.Unexpected command@>
      } 
    }@+ while (!(gf_com==eoc));
-@@ -1577,7 +1598,7 @@
+@@ -1577,7 +1600,7 @@
  
  @<Find and interpret postamble@>=
  find_gf_length();
@@ -191,7 +193,7 @@
  @.only n bytes long@>
  post_loc=gf_len-4;
  @/do@+{
-@@ -1585,16 +1606,16 @@
+@@ -1585,16 +1608,16 @@
  @.all 223\char39s@>
     move_to_byte(post_loc);k=gf_byte();decr(post_loc);
  }@+ while (!(k!=223));
@@ -212,7 +214,7 @@
  @.byte is not post@>
  i=gf_signed_quad(); /*skip over junk*/ 
  design_size=gf_signed_quad();
-@@ -1627,7 +1648,7 @@
+@@ -1627,7 +1650,7 @@
  } @+break;
  @<Specials and |no_op| cases@>;@+break;
  case post_post: ;@+break;
@@ -221,7 +223,7 @@
  @.Unexpected command@>
    } 
  }@+ while (!(gf_com==post_post))
-@@ -2125,7 +2146,7 @@
+@@ -2125,7 +2148,7 @@
  print("'");
  for (k=1; k<=i; k++) 
    {@+if (k > 1) j=gf_byte();
@@ -230,7 +232,7 @@
    if (k < 256-comm_length) pk_byte(j);
    } 
  print_ln("'");@/
-@@ -2137,10 +2158,10 @@
+@@ -2137,10 +2160,10 @@
  @ Of course, we need an array to hold the comment.
  
  @<Glob...@>=
@@ -243,7 +245,7 @@
  
  @ Writing the postamble is even easier.
  
-@@ -2155,16 +2176,19 @@
+@@ -2155,16 +2178,19 @@
  @<Check for unrasterized locators@>=
  for (i=0; i<=255; i++) 
     if (status[i]==located) 
@@ -256,8 +258,8 @@
 -@p int main(void) {
 +@p int main(int argc, char **argv) { assert(argc==4);
 +  assert((output.f=fopen(argv[3],"w"))!=NULL);
-+  gf_name = argv[1];
-+  pk_name = argv[2];
++  gf_name = argv[1]-1;
++  pk_name = argv[2]-1;
    initialize();
    convert_gf_file();
    @<Check for unrasterized locators@>;
