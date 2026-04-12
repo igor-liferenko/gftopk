@@ -8,10 +8,10 @@ all:
 	gcc -o web2w web2w.c web.lex.c pascal-gftopk.tab.c
 	cp gftopk.web gftopk-web2w.web
 	@sed -i "s/(''''/('''_'/" gftopk-web2w.web
-	@sed -i "s/\([,(]\)'\([ !]\)'/\1'\2_'/" gftopk-web2w.web
+	@sed -i "s/\([,(]\)'\([ !]\)'/\1'\2_'/g" gftopk-web2w.web
 	@sed -i '/@d four_cases/,+6s/+/,/g' gftopk-web2w.web
 	@sed -i 's/|packed file of 0..255|//' gftopk-web2w.web
 	./web2w -o cgftopk.w gftopk-web2w.web
-	@sed -i 's/: 1\b//g;s/,\(["_]\)/, \1/g;s/"\(.\)_"/"\1"/' cgftopk.w
+	@sed -i 's/"\(.\)_"/"\1"/g' cgftopk.w
 	@sed -i '/@d four_cases/,+6s/: case/+/g' cgftopk.w
 	patch -s cgftopk.w cgftopk.patch

@@ -35,10 +35,10 @@
  contains the only non-local |goto| statement in \.{GFtoPK}.
  @^system dependencies@>
  
--@d abort(...) {@+print(" ", __VA_ARGS__);jump_out();
-+@d abort(...) {  print(" "  __VA_ARGS__);jump_out();
+-@d abort(...) {@+print(" ",__VA_ARGS__);jump_out();
++@d abort(...) {  print(" " __VA_ARGS__);jump_out();
      } 
--@d bad_gf(...) abort("Bad GF file: ", __VA_ARGS__, "!")
+-@d bad_gf(...) abort("Bad GF file: ",__VA_ARGS__,"!")
 +@d bad_gf(X,...) abort("Bad GF file: " X "!", ##__VA_ARGS__)
  @.Bad GF file@>
  
@@ -161,7 +161,7 @@
          case boc: case boc1: @<Interpret character@>@;@+break;
          @<Specials and |no_op| cases@>;@+break;
          case post: ;@+break; /*we will actually do the work for this one later*/ 
--     default:bad_gf("Unexpected ", gf_com, " command between characters")@;
+-     default:bad_gf("Unexpected ", gf_com: 1," command between characters")@;
 +     default:bad_gf("Unexpected %d command between characters", gf_com)
  @.Unexpected command@>
       } 
@@ -170,7 +170,7 @@
    if (gf_ch >= 0) gf_ch_mod_256=gf_ch%256;
    else gf_ch_mod_256=255-((-(1+gf_ch))%256);
    if (status[gf_ch_mod_256]==virgin) 
--    bad_gf("no character locator for character ", gf_ch);
+-    bad_gf("no character locator for character ", gf_ch: 1);
 +    bad_gf("no character locator for character %d", gf_ch);
  @.no character locator...@>
    @<Convert character to packed form@>;
@@ -179,7 +179,7 @@
      abort("Internal error while writing character!");
  @.Internal error@>
  } @+break;
--default:bad_gf("Unexpected ", gf_com, " command in character definition")@;
+-default:bad_gf("Unexpected ", gf_com: 1," command in character definition")@;
 +default:bad_gf("Unexpected %d command in character definition", gf_com)
  @.Unexpected command@>
      } 
@@ -188,7 +188,7 @@
  
  @<Find and interpret postamble@>=
  find_gf_length();
--if (gf_len < 8) bad_gf("only ", gf_len, " bytes long");
+-if (gf_len < 8) bad_gf("only ", gf_len: 1," bytes long");
 +if (gf_len < 8) bad_gf("only %d bytes long", gf_len);
  @.only n bytes long@>
  post_loc=gf_len-4;
@@ -197,19 +197,19 @@
  @.all 223\char39s@>
     move_to_byte(post_loc);k=gf_byte();decr(post_loc);
  }@+ while (!(k!=223));
--if (k!=gf_id_byte) bad_gf("ID byte is ", k);
+-if (k!=gf_id_byte) bad_gf("ID byte is ", k: 1);
 +if (k!=gf_id_byte) bad_gf("ID byte is %d", k);
  @.ID byte is wrong@>
--if (post_loc < 5) bad_gf("post location is ", post_loc);
+-if (post_loc < 5) bad_gf("post location is ", post_loc: 1);
 +if (post_loc < 5) bad_gf("post location is %d", post_loc);
  @.post location is@>
  move_to_byte(post_loc-3);
  q=gf_signed_quad();
--if ((q < 0)||(q > post_loc-3)) bad_gf("post pointer is ", q);
+-if ((q < 0)||(q > post_loc-3)) bad_gf("post pointer is ", q: 1);
 +if ((q < 0)||(q > post_loc-3)) bad_gf("post pointer is %d", q);
  @.post pointer is wrong@>
  move_to_byte(q);k=gf_byte();
--if (k!=post) bad_gf("byte at ", q, " is not post");
+-if (k!=post) bad_gf("byte at ", q: 1," is not post");
 +if (k!=post) bad_gf("byte at %d is not post", q);
  @.byte is not post@>
  i=gf_signed_quad(); /*skip over junk*/ 
@@ -218,7 +218,7 @@
  } @+break;
  @<Specials and |no_op| cases@>;@+break;
  case post_post: ;@+break;
--default:bad_gf("Unexpected ", gf_com, " in postamble")@;
+-default:bad_gf("Unexpected ", gf_com: 1," in postamble")@;
 +default:bad_gf("Unexpected %d in postamble", gf_com)
  @.Unexpected command@>
    } 
@@ -249,7 +249,7 @@
  @<Check for unrasterized locators@>=
  for (i=0; i<=255; i++) 
     if (status[i]==located) 
--      print_ln("Character ", i, " missing raster information!")
+-      print_ln("Character ", i: 1," missing raster information!")
 +      print_ln("Character %d missing raster information!", i)
  @.missing raster information@>
  
@@ -263,7 +263,7 @@
    initialize();
    convert_gf_file();
    @<Check for unrasterized locators@>;
--  print_ln(gf_len, " bytes packed to ", pk_loc, " bytes.");
+-  print_ln(gf_len: 1," bytes packed to ", pk_loc: 1," bytes.");
 +  print_ln("%d bytes packed to %d bytes.", gf_len, pk_loc);
  return 0; }
  
