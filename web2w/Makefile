@@ -1,5 +1,5 @@
 all:
-	tie -c web2w.ch web2w.w tab.ch web2w-gftopk.ch >/dev/null
+	tie -c web2w.ch web2w.w tab.ch web2w-gftopk.ch at-gftopk.ch >/dev/null
 	ctangle web2w web2w
 	patch -so web-gftopk.l web.l web-gftopk.patch
 	flex -o web.lex.c web-gftopk.l

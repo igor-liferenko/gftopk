@@ -35,64 +35,64 @@
  contains the only non-local |goto| statement in \.{GFtoPK}.
  @^system dependencies@>
  
--@d abort(...) {@+print(" ",__VA_ARGS__);jump_out();
-+@d abort(...) {  print(" " __VA_ARGS__);jump_out();
+-@d abort(...) { print(" ",__VA_ARGS__);jump_out();
++@d abort(...) { print(" " __VA_ARGS__);jump_out();
      } 
 -@d bad_gf(...) abort("Bad GF file: ",__VA_ARGS__,"!")
 +@d bad_gf(X,...) abort("Bad GF file: " X "!", ##__VA_ARGS__)
  @.Bad GF file@>
  
  @p void jump_out(void)
--{@+exit(0);
-+{  exit(1);
+-{ exit(0);
++{ exit(1);
  } 
  
  @*The character set.
 @@ -219,7 +239,7 @@
  @<Globals...@>=
- ASCII_code @!xord[256];
+ ASCII_code xord[256];
     /*specifies conversion of input characters*/ 
--uint8_t @!xchr[256];
+-uint8_t xchr[256];
 +text_char xchr[256];
     /*specifies conversion of output characters*/ 
  
  @ Under our assumption that the visible characters of standard ASCII are
 @@ -1126,18 +1146,20 @@
  @<Glob...@>=
- byte_file @!gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
- byte_file @!pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
+ byte_file gf_file; /*the stuff we are \.{GFtoPK}ing*/ 
+ byte_file pk_file; /*the stuff we have \.{GFtoPK}ed*/ 
 +text_file output;
 +char *gf_name, *pk_name;
  
  @ To prepare the |gf_file| for input, we |reset| it.
  
  @p void open_gf_file(void) /*prepares to read packed bytes in |gf_file|*/ 
--{@+reset(gf_file);
-+{  reset(gf_file, gf_name);
+-{ reset(gf_file);
++{ reset(gf_file, gf_name);
  gf_loc=0;
  } 
  
  @ To prepare the |pk_file| for output, we |rewrite| it.
  
  @p void open_pk_file(void) /*prepares to write packed bytes in |pk_file|*/ 
--{@+rewrite(pk_file);
-+{  rewrite(pk_file, pk_name);
+-{ rewrite(pk_file);
++{ rewrite(pk_file, pk_name);
  pk_loc=0;pk_open=true;
  } 
  
 @@ -1169,17 +1191,18 @@
- {@+eight_bits b;
- if (eof(gf_file)) bad_gf("Unexpected end of file!")@;
+ { eight_bits b;
+ if (eof(gf_file)) bad_gf("Unexpected end of file!") 
  @.Unexpected end of file@>
--else{@+read(gf_file, b);gf_byte=b;
-+else{  read(gf_file, b);
+-else{ read(gf_file, b);gf_byte=b;
++else{ read(gf_file, b);
    } 
  incr(gf_loc);
 +return b;
  } 
  @#
  int gf_signed_quad(void) /*returns the next four bytes, signed*/ 
- {@+eight_bits a, @!b, @!c, @!d;
+ { eight_bits a, b, c, d;
  read(gf_file, a);read(gf_file, b);read(gf_file, c);read(gf_file, d);
 -if (a < 128) gf_signed_quad=((a*256+b)*256+c)*256+d;
 -else gf_signed_quad=(((a-256)*256+b)*256+c)*256+d;
@@ -103,8 +103,8 @@
  
  @ We also need a few routines to write data to the \.{PK} file.  We write
 @@ -1191,7 +1214,7 @@
- {@+
-    if (pk_open) {@+
+ { 
+    if (pk_open) { 
        if (a < 0) a=a+256;
 -      write(pk_file, a);
 +      write(pk_file, "%c", a);
@@ -113,7 +113,7 @@
  } 
 @@ -1199,16 +1222,16 @@
  void pk_halfword(int a)
- {@+
+ { 
     if (a < 0) a=a+65536;
 -   write(pk_file, a/256);
 -   write(pk_file, a%256);
@@ -123,7 +123,7 @@
  } 
  @#
  void pk_three_bytes(int a)
- {@+
+ { 
 -   write(pk_file, a/65536%256);
 -   write(pk_file, a/256%256);
 -   write(pk_file, a%256);
@@ -151,17 +151,17 @@
 @@ -1262,7 +1285,7 @@
  
  @p void find_gf_length(void)
- {@+
+ { 
 -   set_pos(gf_file,-1);gf_len=cur_pos(gf_file);
 +   fseek(gf_file.f,0,SEEK_END);gf_len=ftell(gf_file.f);
  } 
  @#
- void move_to_byte(int @!n)
+ void move_to_byte(int n)
 @@ -1389,7 +1412,7 @@
          case boc: case boc1: @<Interpret character@>@;@+break;
          @<Specials and |no_op| cases@>;@+break;
          case post: ;@+break; /*we will actually do the work for this one later*/ 
--     default:bad_gf("Unexpected ", gf_com: 1," command between characters")@;
+-     default:bad_gf("Unexpected ", gf_com: 1," command between characters") 
 +     default:bad_gf("Unexpected %d command between characters", gf_com)
  @.Unexpected command@>
       } 
@@ -179,7 +179,7 @@
      abort("Internal error while writing character!");
  @.Internal error@>
  } @+break;
--default:bad_gf("Unexpected ", gf_com: 1," command in character definition")@;
+-default:bad_gf("Unexpected ", gf_com: 1," command in character definition") 
 +default:bad_gf("Unexpected %d command in character definition", gf_com)
  @.Unexpected command@>
      } 
@@ -218,7 +218,7 @@
  } @+break;
  @<Specials and |no_op| cases@>;@+break;
  case post_post: ;@+break;
--default:bad_gf("Unexpected ", gf_com: 1," in postamble")@;
+-default:bad_gf("Unexpected ", gf_com: 1," in postamble") 
 +default:bad_gf("Unexpected %d in postamble", gf_com)
  @.Unexpected command@>
    } 
@@ -226,7 +226,7 @@
 @@ -2125,7 +2148,7 @@
  print("'");
  for (k=1; k<=i; k++) 
-   {@+if (k > 1) j=gf_byte();
+   { if (k > 1) j=gf_byte();
 -  print(xchr[j]);
 +  print("%c",xchr[j]);
    if (k < 256-comm_length) pk_byte(j);
@@ -236,7 +236,7 @@
  @ Of course, we need an array to hold the comment.
  
  @<Glob...@>=
--uint8_t @!comment0[comm_length], *const @!comment = @!comment0-1;
+-uint8_t comment0[comm_length], *const comment = comment0-1;
 +unsigned char comment0[comm_length+1], *const comment = comment0-1;
  
  @ @<Set init...@>=
