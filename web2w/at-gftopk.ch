@@ -10,6 +10,16 @@
 @z
 
 @x
+     wputs("enum {@@+"), wid(t), wput('=');
+     t=wprint_to(t->link->next,t->link->link);
+     wputs("@@+};");
+@y
+     wputs("enum { "), wid(t), wput('=');
+     t=wprint_to(t->link->next,t->link->link);
+     wputs(" };");
+@z
+
+@x
         winsert_after(t,ATSEMICOLON,"@@;");
 @y
         winsert_after(t,ATSEMICOLON," ");
