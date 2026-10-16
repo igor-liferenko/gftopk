@@ -1,4 +1,17 @@
 @x
+case ATPLUS:
+  t=t->next;
+  if (!following_directive(t))
+    wputs("@@+");
+@y
+case ATPLUS:
+  t=t->next;
+  if (!following_directive(t)) {
+    if (t->previous->previous->tag == EQEQ) wputs(""); else wputs(" ");
+  }
+@z
+
+@x
   if (!following_directive(t)) wputs("@@+");
 @y
   if (!following_directive(t)) wputs(" ");
