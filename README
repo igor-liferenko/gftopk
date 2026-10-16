@@ -1,7 +1,9 @@
 Add this `gftopk' script to PATH:
 
     #!/bin/sh
-    /path/to/gftopk/gftopk $1 ${1%gf}pk /tmp/gftopk.$$
+    pk_file=`basename "${1%gf}pk"`
+    [ "$2" ] && pk_file="$2"
+    /path/to/gftopk/gftopk "$1" "$pk_file" /tmp/gftopk.$$
     ret=$?
     sed '$a\' /tmp/gftopk.$$ 2>/dev/null
     rm -f /tmp/gftopk.$$
